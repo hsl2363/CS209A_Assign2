@@ -23,7 +23,15 @@ public class Controller implements Initializable {
     @FXML
     ListView<Message> chatContentList;
 
+    int onlinecnt;
+
     String username;
+
+    @FXML
+    Label currentuser;
+
+    @FXML
+    Label currentonlinecnt;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -36,14 +44,17 @@ public class Controller implements Initializable {
         Optional<String> input = dialog.showAndWait();
         if (input.isPresent() && !input.get().isEmpty()) {
             /*
-               TODO: Check if there is a user with the same name among the currently logged-in users,
-                     if so, ask the user to change the username
+             * TODO: Check if there is a user with the same name among the currently
+             * logged-in users,
+             * if so, ask the user to change the username
              */
             username = input.get();
         } else {
             System.out.println("Invalid username " + input + ", exiting");
             Platform.exit();
         }
+
+        currentuser.setText("Current User: " + username);
 
         chatContentList.setCellFactory(new MessageCellFactory());
     }
@@ -55,7 +66,8 @@ public class Controller implements Initializable {
         Stage stage = new Stage();
         ComboBox<String> userSel = new ComboBox<>();
 
-        // FIXME: get the user list from server, the current user's name should be filtered out
+        // FIXME: get the user list from server, the current user's name should be
+        // filtered out
         userSel.getItems().addAll("Item 1", "Item 2", "Item 3");
 
         Button okBtn = new Button("OK");
@@ -71,16 +83,20 @@ public class Controller implements Initializable {
         stage.setScene(new Scene(box));
         stage.showAndWait();
 
-        // TODO: if the current user already chatted with the selected user, just open the chat with that user
-        // TODO: otherwise, create a new chat item in the left panel, the title should be the selected user's name
+        // TODO: if the current user already chatted with the selected user, just open
+        // the chat with that user
+        // TODO: otherwise, create a new chat item in the left panel, the title should
+        // be the selected user's name
     }
 
     /**
      * A new dialog should contain a multi-select list, showing all user's name.
-     * You can select several users that will be joined in the group chat, including yourself.
+     * You can select several users that will be joined in the group chat, including
+     * yourself.
      * <p>
      * The naming rule for group chats is similar to WeChat:
-     * If there are > 3 users: display the first three usernames, sorted in lexicographic order, then use ellipsis with the number of users, for example:
+     * If there are > 3 users: display the first three usernames, sorted in
+     * lexicographic order, then use ellipsis with the number of users, for example:
      * UserA, UserB, UserC... (10)
      * If there are <= 3 users: do not display the ellipsis, for example:
      * UserA, UserB (2)
@@ -101,8 +117,10 @@ public class Controller implements Initializable {
     }
 
     /**
-     * You may change the cell factory if you changed the design of {@code Message} model.
-     * Hint: you may also define a cell factory for the chats displayed in the left panel, or simply override the toString method.
+     * You may change the cell factory if you changed the design of {@code Message}
+     * model.
+     * Hint: you may also define a cell factory for the chats displayed in the left
+     * panel, or simply override the toString method.
      */
     private class MessageCellFactory implements Callback<ListView<Message>, ListCell<Message>> {
         @Override
