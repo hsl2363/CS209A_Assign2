@@ -8,6 +8,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import javafx.util.Callback;
@@ -17,15 +18,34 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicReference;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+// import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.net.Socket;
 
 public class Controller implements Initializable {
+
+    private Socket socket;
+    private PrintWriter out;
+    private BufferedReader in;
+
+    private String username;
+
+    public String getUser() {
+        return username;
+    }
+
+    public Socket getSocket() {
+        return socket;
+    }
 
     @FXML
     ListView<Message> chatContentList;
 
-    int onlinecnt;
-
-    String username;
+    @FXML
+    ListView<String> userList;
 
     @FXML
     Label currentuser;
@@ -35,27 +55,37 @@ public class Controller implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        try {
+            socket = new Socket("localhost", 2363);
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            out = new PrintWriter(socket.getOutputStream());
 
-        Dialog<String> dialog = new TextInputDialog();
-        dialog.setTitle("Login");
-        dialog.setHeaderText(null);
-        dialog.setContentText("Username:");
+            Dialog<String> dialog = new TextInputDialog();
+            dialog.setTitle("Login");
+            dialog.setHeaderText(null);
+            dialog.setContentText("Username:");
 
-        Optional<String> input = dialog.showAndWait();
-        if (input.isPresent() && !input.get().isEmpty()) {
-            /*
-             * TODO: Check if there is a user with the same name among the currently
-             * logged-in users,
-             * if so, ask the user to change the username
-             */
-            username = input.get();
-        } else {
-            System.out.println("Invalid username " + input + ", exiting");
-            Platform.exit();
+            Optional<String> input = dialog.showAndWait();
+            if (input.isPresent() && !input.get().isEmpty()) {
+                out.println("CheckName;" + username);
+                if (in.readLine().equals("OK"))
+                    username = input.get();
+                else {
+                    Alert nameused = new Alert(AlertType.WARNING);
+                    nameused.setContentText("User name has been used! Please change the user name");
+                    nameused.show();
+                    Platform.exit();
+                }
+            } else {
+                Alert invalid = new Alert(AlertType.ERROR);
+                invalid.setContentText("Invalid username, exiting");
+                invalid.show();
+                Platform.exit();
+            }
+        } catch (IOException e) {
+            System.out.println(e);
         }
-
         currentuser.setText("Current User: " + username);
-
         chatContentList.setCellFactory(new MessageCellFactory());
     }
 
@@ -160,4 +190,17 @@ public class Controller implements Initializable {
             };
         }
     }
+
+    public void Quit() {
+        out.println("UserQuit");
+        try {
+
+            socket.getInputStream().close();
+            socket.getOutputStream().close();
+            socket.close();
+        } catch (IOException e) {
+            System.out.println(e);
+        }
+    }
+
 }

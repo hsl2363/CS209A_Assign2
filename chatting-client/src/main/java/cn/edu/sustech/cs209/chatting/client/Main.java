@@ -9,6 +9,8 @@ import java.io.IOException;
 
 public class Main extends Application {
 
+    private static Controller controller;
+
     public static void main(String[] args) {
         launch();
     }
@@ -16,8 +18,16 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("main.fxml"));
+        controller = fxmlLoader.getController();
         stage.setScene(new Scene(fxmlLoader.load()));
         stage.setTitle("Chatting Client");
         stage.show();
     }
+
+    @Override
+    public void stop() {
+        controller.Quit();
+        System.out.printf("%s quit.", controller.getUser());
+    }
+
 }

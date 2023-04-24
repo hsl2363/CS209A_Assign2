@@ -9,6 +9,7 @@
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
@@ -23,7 +24,27 @@
         </Menu>
     </MenuBar>
     <SplitPane dividerPositions="0.25" focusTraversable="true" VBox.vgrow="ALWAYS">
-        <ListView fx:id="chatList" prefHeight="200.0" prefWidth="200.0" />
+      <VBox maxHeight="1.7976931348623157E308" prefHeight="200.0" prefWidth="100.0">
+         <children>
+            <TitledPane maxHeight="1.7976931348623157E308" text="Chatting">
+               <content>
+                  <ListView prefWidth="220.0" />
+               </content>
+            </TitledPane>
+            <TitledPane maxHeight="1.7976931348623157E308" VBox.vgrow="SOMETIMES">
+               <content>
+                    <ListView fx:id="chatList" prefWidth="220.0" />
+               </content>
+               <graphic>
+                    <Label fx:id="Onlinecnt" text="Online Users: ">
+                     <font>
+                        <Font size="11.0" fx:id="x6" />
+                     </font>
+                  </Label>
+               </graphic>
+            </TitledPane>
+         </children>
+      </VBox>
         <SplitPane dividerPositions="0.85" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
             <ListView fx:id="chatContentList" prefHeight="200.0" prefWidth="200.0" />
             <HBox prefHeight="100.0" prefWidth="200.0">
@@ -45,6 +66,5 @@
             </textFill>
         </Label>
         <Pane HBox.hgrow="ALWAYS" />
-        <Label fx:id="Onlinecnt" font="$x3" text="Online: " textFill="$x4" HBox.hgrow="NEVER" />
     </HBox>
 </VBox>
