@@ -105,9 +105,10 @@ public class Controller implements Initializable {
 							Chat chat = privatechats.get(from);
 							Message msg = new Message(Long.valueOf(str[3]), str[1], str[2], str[4]);
 							chat.Addmsg(msg);
+							Boolean update = chat != currentchat;
 							Platform.runLater(() -> {
 								ChatList.refresh();
-								if (chat == currentchat)
+								if (!update)
 									chatContentList.refresh();
 								else
 									chat.setUpdate(true);
@@ -119,12 +120,13 @@ public class Controller implements Initializable {
 							Chat gchat = groupchats.get(id);
 							Message gmsg = new Message(Long.valueOf(str[3]), str[1], str[2], str[4]);
 							gchat.Addmsg(gmsg);
+							Boolean gupdate = gchat != currentchat;
 							Platform.runLater(() -> {
-								ChatList.refresh();
-								if (gchat == currentchat)
+								if (!gupdate)
 									chatContentList.refresh();
 								else
 									gchat.setUpdate(true);
+								ChatList.refresh();
 							});
 							break;
 						case "AddPrivate":
@@ -142,9 +144,14 @@ public class Controller implements Initializable {
 								S.add(str[i]);
 							String CreateBy = S.get(0);
 							Chat c = new Chat(S, gid);
-							c.setUpdate(!CreateBy.equals(username));
+							if (!CreateBy.equals(username))
+								c.setUpdate(true);
 							groupchats.put(gid, c);
 							Platform.runLater(() -> {
+								if (CreateBy.equals(username)) {
+									currentchat = c;
+									chatContentList.setItems(c.getmsg());
+								}
 								ChatList.getItems().add(c);
 							});
 							break;
