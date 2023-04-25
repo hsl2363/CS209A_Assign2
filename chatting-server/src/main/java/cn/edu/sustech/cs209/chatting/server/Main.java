@@ -2,7 +2,6 @@ package cn.edu.sustech.cs209.chatting.server;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-// import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
@@ -11,8 +10,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-// import java.util.concurrent.locks.Lock;
-// import java.util.concurrent.locks.ReentrantLock;
 
 public class Main {
 
@@ -106,7 +103,7 @@ public class Main {
 
             PrintWriter out = new PrintWriter(socket.getOutputStream());
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            while ((username = in.readLine()) != null) {
+            if ((username = in.readLine()) != null) {
                 if (somap.containsKey(username)) {
                     out.println("NO");
                 } else {
@@ -169,6 +166,7 @@ public class Main {
                             SendMessage(Integer.valueOf(str[2]), input);
                             break;
                         default:
+                            System.out.println("unrecognized");
                             break;
                     }
                     if (quit) {
@@ -186,25 +184,6 @@ public class Main {
                 }
             }
         }
-
-        // private class OutputHandler implements Runnable {
-        // @Override
-        // public void run() {
-        // while (true) {
-        // synchronized (this) {
-        // try {
-        // wait();
-        // } catch (InterruptedException e) {
-        // e.printStackTrace();
-        // }
-        // }
-        // broadcast(input);
-        // synchronized (ClientHandler.this) {
-        // ClientHandler.this.notify();
-        // }
-        // }
-        // }
-        // }
 
     }
 

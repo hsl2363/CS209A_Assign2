@@ -70,7 +70,7 @@ public class Controller implements Initializable {
 	Label currentuser;
 
 	@FXML
-	Label currentonlinecnt;
+	Label currentOnlinecnt;
 
 	private class ServerHandler implements Runnable {
 
@@ -132,6 +132,7 @@ public class Controller implements Initializable {
 							ChatList.getItems().add(c);
 							break;
 						default:
+							System.out.println("unrecognized");
 							break;
 					}
 				}
@@ -153,6 +154,14 @@ public class Controller implements Initializable {
 			socket = new Socket("localhost", 2363);
 			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			out = new PrintWriter(socket.getOutputStream());
+			ServerHandler T = new ServerHandler();
+			Thread t = new Thread(T);
+			t.start();
+			userList.setCellFactory(new UserCellFactory());
+			currentOnlinecnt = new Label("Online user:");
+			chatContentList.setCellFactory(new MessageCellFactory());
+			ChatList.setCellFactory(new ChatCellFactory());
+			ChatList.setItems(FXCollections.observableArrayList());
 
 			Dialog<String> dialog = new TextInputDialog();
 			dialog.setTitle("Login");
@@ -179,16 +188,7 @@ public class Controller implements Initializable {
 		} catch (IOException e) {
 			System.out.println(e);
 		}
-		ServerHandler T = new ServerHandler();
-		Thread t = new Thread(T);
-		t.start();
 		currentuser.setText("Current User: " + username);
-		chatContentList.setCellFactory(new MessageCellFactory());
-		ChatList.setCellFactory(new ChatCellFactory());
-		ChatList.setItems(FXCollections.observableArrayList());
-		userList.setCellFactory(new UserCellFactory());
-
-		currentonlinecnt = new Label("Online user: 0");
 	}
 
 	@FXML
@@ -281,11 +281,11 @@ public class Controller implements Initializable {
 	 */
 
 	@FXML
-	private TextArea text;
+	private TextArea inputArea;
 
 	@FXML
 	public void doSendMessage() {
-		String content = text.getText();
+		String content = inputArea.getText();
 		if (currentchat.getGroup() > 0) {
 			int SendTo = currentchat.getGroup();
 			out.println("SendMessageG;" + username + ";" + SendTo + ";" + System.currentTimeMillis() + ";" + content);
@@ -294,7 +294,7 @@ public class Controller implements Initializable {
 					: currentchat.getMember().get(0);
 			out.println("SendMessageP;" + username + ";" + SendTo + ";" + System.currentTimeMillis() + ";" + content);
 		}
-		text.clear();
+		inputArea.clear();
 		// DONE
 	}
 
