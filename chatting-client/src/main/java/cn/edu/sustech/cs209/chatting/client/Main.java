@@ -27,7 +27,7 @@ public class Main extends Application {
     @Override
     public void stop() {
         controller.Quit();
-        System.out.printf("%s quit.", controller.getUser());
+        System.out.printf("%s quit.", controller.getcurrentUser());
     }
 
 }

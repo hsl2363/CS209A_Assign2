@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 // import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -22,6 +21,8 @@ public class Main {
     private static Map<String, Socket> somap = new HashMap<>();
     private static Map<String, ClientHandler> chmap = new HashMap<>();
     private static List<ClientHandler> handlers = new ArrayList<>();
+    private static int groupcnt = 0;
+    private static Map<Integer, List<String>> Groupmember = new HashMap<>();
 
     private static void UpdateUserList() {
         String S = "UserList;";
@@ -49,6 +50,30 @@ public class Main {
     private static void SendMessage(String SendTo, String S) {
         ClientHandler to = chmap.get(SendTo);
         to.out.println(S);
+    }
+
+    private static void SendMessage(int SendTo, String S) {
+        List<String> group = Groupmember.get(SendTo);
+        for (String to : group) {
+            ClientHandler h = chmap.get(to);
+            h.out.println(S);
+        }
+    }
+
+    private static void CreatePrivate(String A, String B) {
+        ClientHandler b = chmap.get(B);
+        b.out.println("AddPrivate;" + A);
+    }
+
+    private static void CreateGroup(List<String> users) {
+        String S = "AddGroup;" + ++groupcnt;
+        List<ClientHandler> ch = new ArrayList<>();
+        for (String user : users) {
+            S += ";" + user;
+            ch.add(chmap.get(user));
+        }
+        for (ClientHandler h : ch)
+            h.out.println(S);
     }
 
     public static void main(String[] args) throws IOException {
@@ -79,23 +104,20 @@ public class Main {
             Socket socket = serversocket.accept();
             usersockets.add(socket);
 
-            OutputStream os = socket.getOutputStream();
+            PrintWriter out = new PrintWriter(socket.getOutputStream());
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            while (true) {
-                username = in.readLine();
+            while ((username = in.readLine()) != null) {
                 if (somap.containsKey(username)) {
-                    os.write(0);
+                    out.println("NO");
                 } else {
-                    os.write(1);
+                    out.println("OK");
+                    usernames.add(username);
                     break;
                 }
             }
             in.close();
-
             somap.put(username, socket);
             System.out.printf("%s Connected.", username);
-            usernames.add(username);
-
             UpdateUserList();
 
             ClientHandler T = new ClientHandler(username, socket);
@@ -132,11 +154,21 @@ public class Main {
                             quit = true;
                             break;
                         case "CreatePrivate":
+                            CreatePrivate(str[1], str[2]);
                             break;
                         case "CreateGroup":
+                            List<String> users = new ArrayList<>();
+                            for (int i = 1; i < str.length; i++)
+                                users.add(str[i]);
+                            CreateGroup(users);
                             break;
-                        case "SendMessage":
+                        case "SendMessageP":
                             SendMessage(str[2], input);
+                            break;
+                        case "SendMessageG":
+                            SendMessage(Integer.valueOf(str[2]), input);
+                            break;
+                        default:
                             break;
                     }
                     if (quit) {
