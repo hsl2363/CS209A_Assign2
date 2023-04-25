@@ -45,22 +45,14 @@ public class Controller implements Initializable {
 
 	private ObservableList<String> users = FXCollections.observableArrayList();
 
-	public String getcurrentUser() {
-		return username;
-	}
-
-	public Socket getSocket() {
-		return socket;
-	}
-
 	@FXML
 	ListView<Message> chatContentList;
 	@FXML
 	ListView<Chat> ChatList;
 
-	private static Chat currentchat;
-	private static Map<String, Chat> privatechats = new HashMap<>();
-	private static Map<Integer, Chat> groupchats = new HashMap<>();
+	private Chat currentchat;
+	private Map<String, Chat> privatechats = new HashMap<>();
+	private Map<Integer, Chat> groupchats = new HashMap<>();
 
 	@FXML
 	ListView<String> userList;
@@ -92,8 +84,10 @@ public class Controller implements Initializable {
 								String s = str[i];
 								ulist.add(s);
 							}
-							userList.setItems(ulist);
-							currentOnlinecnt.setText("Online users: " + ulist.size());
+							Platform.runLater(() -> {
+								userList.setItems(ulist);
+								currentOnlinecnt.setText("Online users: " + ulist.size());
+							});
 							System.out.println("UserCnt: " + ulist.size());
 							break;
 						case "ServerClosed":
@@ -122,7 +116,9 @@ public class Controller implements Initializable {
 							Chat nchat = new Chat(Arrays.asList(username, str[1]), 0);
 							nchat.setUpdate(true);
 							privatechats.put(str[1], nchat);
-							ChatList.getItems().add(nchat);
+							Platform.runLater(() -> {
+								ChatList.getItems().add(nchat);
+							});
 							break;
 						case "AddGroup":
 							List<String> S = new ArrayList<>();
@@ -132,11 +128,15 @@ public class Controller implements Initializable {
 							Chat c = new Chat(S, gid);
 							c.setUpdate(true);
 							groupchats.put(gid, c);
-							ChatList.getItems().add(c);
+							Platform.runLater(() -> {
+								ChatList.getItems().add(c);
+							});
 							break;
 						case "CheckOK":
 							username = str[1];
-							currentuser.setText("Current User: " + username);
+							Platform.runLater(() -> {
+								currentuser.setText("Current User: " + username);
+							});
 							break;
 						case "CheckNO":
 							Alert nameused = new Alert(AlertType.WARNING);
@@ -149,7 +149,9 @@ public class Controller implements Initializable {
 							break;
 					}
 				}
-			} catch (IOException e) {
+			} catch (
+
+			IOException e) {
 				System.out.println("Error handling server: " + e);
 			} finally {
 				try {
@@ -160,6 +162,7 @@ public class Controller implements Initializable {
 				}
 			}
 		}
+
 	}
 
 	@Override
@@ -207,7 +210,7 @@ public class Controller implements Initializable {
 		ComboBox<String> userSel = new ComboBox<>();
 
 		for (String name : users) {
-			if (name != username)
+			if (name.equals(username))
 				userSel.getItems().add(name);
 		}
 		// Done: get the user list from server, the current user's name should be
@@ -227,12 +230,19 @@ public class Controller implements Initializable {
 		stage.setScene(new Scene(box));
 		stage.showAndWait();
 
+		if (user.get() == null)
+			return;
 		if (privatechats.containsKey(user.get()))
-			chatContentList.setItems(privatechats.get(user.get()).getmsg());
+			Platform.runLater(() -> {
+				chatContentList.setItems(privatechats.get(user.get()).getmsg());
+			});
 		else {
 			Chat chat = new Chat(Arrays.asList(username, user.get()), 0);
 			privatechats.put(user.get(), chat);
 			out.println("CreatePrivate;" + username + user.get());
+			Platform.runLater(() -> {
+				chatContentList.setItems(chat.getmsg());
+			});
 		}
 
 		// Done: if the current user already chatted with the selected user, just open
@@ -259,7 +269,7 @@ public class Controller implements Initializable {
 		Stage stage = new Stage();
 		List<CheckBox> names = new ArrayList<>();
 		for (String name : users) {
-			if (name != username)
+			if (name.equals(username) == false)
 				names.add(new CheckBox(name));
 		}
 		Button okBtn = new Button("OK");
@@ -279,6 +289,13 @@ public class Controller implements Initializable {
 		box.getChildren().add(okBtn);
 		stage.setScene(new Scene(box));
 		stage.showAndWait();
+		if (res.size() > 0) {
+			String S = "CreateGroup";
+			for (String name : res)
+				S += ";" + name;
+			out.println(S);
+		}
+
 	}
 
 	/**
@@ -431,8 +448,6 @@ public class Controller implements Initializable {
 	public void Quit() {
 		out.println("UserQuit");
 		try {
-			socket.getInputStream().close();
-			socket.getOutputStream().close();
 			socket.close();
 		} catch (IOException e) {
 			System.out.println(e);

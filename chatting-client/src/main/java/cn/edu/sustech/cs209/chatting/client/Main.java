@@ -9,7 +9,7 @@ import java.io.IOException;
 
 public class Main extends Application {
 
-    private static Controller controller;
+    private Controller controller;
 
     public static void main(String[] args) {
         launch();
@@ -27,7 +27,7 @@ public class Main extends Application {
     @Override
     public void stop() {
         controller.Quit();
-        System.out.printf("%s quit.", controller.getcurrentUser());
+        System.out.printf("Quit.");
     }
 
 }
