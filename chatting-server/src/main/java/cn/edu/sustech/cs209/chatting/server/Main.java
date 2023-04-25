@@ -62,6 +62,7 @@ public class Main {
 
     private static void CreateGroup(List<String> users) {
         String S = "AddGroup;" + ++groupcnt;
+        Groupmember.put(groupcnt, users);
         List<ClientHandler> ch = new ArrayList<>();
         for (String user : users) {
             S += ";" + user;

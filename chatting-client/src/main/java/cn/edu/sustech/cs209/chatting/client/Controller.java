@@ -109,6 +109,8 @@ public class Controller implements Initializable {
 								ChatList.refresh();
 								if (chat == currentchat)
 									chatContentList.refresh();
+								else
+									chat.setUpdate(true);
 							});
 							break;
 
@@ -116,11 +118,13 @@ public class Controller implements Initializable {
 							int id = Integer.valueOf(str[2]);
 							Chat gchat = groupchats.get(id);
 							Message gmsg = new Message(Long.valueOf(str[3]), str[1], str[2], str[4]);
+							gchat.Addmsg(gmsg);
 							Platform.runLater(() -> {
-								gchat.Addmsg(gmsg);
 								ChatList.refresh();
 								if (gchat == currentchat)
 									chatContentList.refresh();
+								else
+									gchat.setUpdate(true);
 							});
 							break;
 						case "AddPrivate":
@@ -136,8 +140,9 @@ public class Controller implements Initializable {
 							int gid = Integer.valueOf(str[1]);
 							for (int i = 2; i < str.length; i++)
 								S.add(str[i]);
+							String CreateBy = S.get(0);
 							Chat c = new Chat(S, gid);
-							c.setUpdate(true);
+							c.setUpdate(!CreateBy.equals(username));
 							groupchats.put(gid, c);
 							Platform.runLater(() -> {
 								ChatList.getItems().add(c);
@@ -310,7 +315,7 @@ public class Controller implements Initializable {
 		stage.setScene(new Scene(box));
 		stage.showAndWait();
 		if (res.size() > 0) {
-			String S = "CreateGroup";
+			String S = "CreateGroup;" + username;
 			for (String name : res)
 				S += ";" + name;
 			out.println(S);
@@ -339,7 +344,7 @@ public class Controller implements Initializable {
 			out.println(
 					"SendMessageG;" + msg.getSentBy() + ";" + msg.getSendTo() + ";" + msg.getTimestamp() + ";"
 							+ msg.getData());
-			currentchat.Addmsg(msg);
+			// currentchat.Addmsg(msg);
 		} else {
 			Message msg = new Message(System.currentTimeMillis(), username,
 					currentchat.getMember().get(0).equals(username) ? currentchat.getMember().get(1)
@@ -426,9 +431,10 @@ public class Controller implements Initializable {
 						chatname = new Label(S);
 					} else
 						chatname = new Label(
-								chat.getMember().get(0).equals(username) ? chat.getMember().get(1) : chat.getMember().get(0));
+								chat.getMember().get(0).equals(username) ? chat.getMember().get(1)
+										: chat.getMember().get(0));
 
-					chatname.setPrefSize(50, 20);
+					chatname.setPrefSize(200, 20);
 					chatname.setWrapText(false);
 					if (chat.getUpdate())
 						chatname.setStyle("-fx-text-fill: red;");
@@ -441,9 +447,11 @@ public class Controller implements Initializable {
 			cell.setOnMouseClicked(event -> {
 				if (!cell.isEmpty() && event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
 					cell.getItem().setUpdate(false);
-					chatContentList.setItems(cell.getItem().getmsg());
 					currentchat = cell.getItem();
-					ChatList.refresh();
+					Platform.runLater(() -> {
+						chatContentList.setItems(cell.getItem().getmsg());
+						ChatList.refresh();
+					});
 				}
 			});
 			return cell;
