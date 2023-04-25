@@ -529,8 +529,9 @@ class Chat {
 	}
 
 	public void Addmsg(Message MSG) {
-		msg.add(MSG);
-		update = true;
+		Platform.runLater(() -> {
+			msg.add(MSG);
+		});
 	}
 
 	public Chat(List<String> Member, int ID) {
