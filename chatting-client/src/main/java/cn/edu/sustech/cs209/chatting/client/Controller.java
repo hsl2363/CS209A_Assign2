@@ -105,15 +105,23 @@ public class Controller implements Initializable {
 							Chat chat = privatechats.get(from);
 							Message msg = new Message(Long.valueOf(str[3]), str[1], str[2], str[4]);
 							chat.Addmsg(msg);
-							ChatList.refresh();
+							Platform.runLater(() -> {
+								ChatList.refresh();
+								if (chat == currentchat)
+									chatContentList.refresh();
+							});
 							break;
 
 						case "SendMessageG":
 							int id = Integer.valueOf(str[2]);
 							Chat gchat = groupchats.get(id);
 							Message gmsg = new Message(Long.valueOf(str[3]), str[1], str[2], str[4]);
-							gchat.Addmsg(gmsg);
-							ChatList.refresh();
+							Platform.runLater(() -> {
+								gchat.Addmsg(gmsg);
+								ChatList.refresh();
+								if (gchat == currentchat)
+									chatContentList.refresh();
+							});
 							break;
 						case "AddPrivate":
 							Chat nchat = new Chat(Arrays.asList(username, str[1]), 0);
@@ -150,7 +158,7 @@ public class Controller implements Initializable {
 							});
 							break;
 						default:
-							System.out.println("unrecognized: " + str[0] + str[1]);
+							System.out.println("unrecognized: " + str[0]);
 							break;
 					}
 				}
@@ -243,6 +251,7 @@ public class Controller implements Initializable {
 			return;
 		if (privatechats.containsKey(user.get()))
 			Platform.runLater(() -> {
+				currentchat = privatechats.get(user.get());
 				chatContentList.setItems(privatechats.get(user.get()).getmsg());
 			});
 		else {
@@ -251,6 +260,7 @@ public class Controller implements Initializable {
 			out.println("CreatePrivate;" + username + ";" + user.get());
 			Platform.runLater(() -> {
 				ChatList.getItems().add(chat);
+				currentchat = chat;
 				chatContentList.setItems(chat.getmsg());
 			});
 		}
@@ -324,15 +334,23 @@ public class Controller implements Initializable {
 		if (content.length() == 0)
 			return;
 		if (currentchat.getGroup() > 0) {
-			int SendTo = currentchat.getGroup();
+			Message msg = new Message(System.currentTimeMillis(), username, String.valueOf(currentchat.getGroup()),
+					content);
 			out.println(
-					"SendMessageG;" + username + ";" + SendTo + ";" + System.currentTimeMillis() + ";" + content);
+					"SendMessageG;" + msg.getSentBy() + ";" + msg.getSendTo() + ";" + msg.getTimestamp() + ";"
+							+ msg.getData());
+			currentchat.Addmsg(msg);
 		} else {
-			String SendTo = currentchat.getMember().get(0).equals(username) ? currentchat.getMember().get(1)
-					: currentchat.getMember().get(0);
+			Message msg = new Message(System.currentTimeMillis(), username,
+					currentchat.getMember().get(0).equals(username) ? currentchat.getMember().get(1)
+							: currentchat.getMember().get(0),
+					content);
 			out.println(
-					"SendMessageP;" + username + ";" + SendTo + ";" + System.currentTimeMillis() + ";" + content);
+					"SendMessageP;" + msg.getSentBy() + ";" + msg.getSendTo() + ";" + msg.getTimestamp() + ";"
+							+ msg.getData());
+			currentchat.Addmsg(msg);
 		}
+
 		inputArea.clear();
 	}
 
@@ -361,7 +379,7 @@ public class Controller implements Initializable {
 							+ new SimpleDateFormat("yyyy-MM-dd HH-mm-ss").format(msg.getTimestamp()));
 					Label msgLabel = new Label(msg.getData());
 
-					nameLabel.setPrefSize(50, 20);
+					nameLabel.setPrefSize(200, 20);
 					nameLabel.setWrapText(true);
 					nameLabel.setStyle("-fx-border-color: black; -fx-border-width: 1px;");
 
@@ -408,7 +426,7 @@ public class Controller implements Initializable {
 						chatname = new Label(S);
 					} else
 						chatname = new Label(
-								chat.getMember().get(0).equals(username) ? chat.getMember().get(1) : username);
+								chat.getMember().get(0).equals(username) ? chat.getMember().get(1) : chat.getMember().get(0));
 
 					chatname.setPrefSize(50, 20);
 					chatname.setWrapText(false);
@@ -424,6 +442,7 @@ public class Controller implements Initializable {
 				if (!cell.isEmpty() && event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
 					cell.getItem().setUpdate(false);
 					chatContentList.setItems(cell.getItem().getmsg());
+					currentchat = cell.getItem();
 					ChatList.refresh();
 				}
 			});

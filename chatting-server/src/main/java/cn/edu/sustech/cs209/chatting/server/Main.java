@@ -145,10 +145,12 @@ public class Main {
             try {
                 boolean quit = false;
                 char[] input = new char[10000];
+                String S;
                 String[] str;
                 int len = 0;
                 while ((len = in.read(input)) != -1) {
-                    str = new String(input).substring(0, len - 2).split(";");
+                    S = new String(input).substring(0, len - 2);
+                    str = S.split(";");
                     switch (str[0]) {
                         case "UserQuit":
                             quit = true;
@@ -163,10 +165,10 @@ public class Main {
                             CreateGroup(users);
                             break;
                         case "SendMessageP":
-                            SendMessage(str[2], input.toString());
+                            SendMessage(str[2], S);
                             break;
                         case "SendMessageG":
-                            SendMessage(Integer.valueOf(str[2]), input.toString());
+                            SendMessage(Integer.valueOf(str[2]), S);
                             break;
                         default:
                             System.out.println("unrecognized: " + str[0]);
