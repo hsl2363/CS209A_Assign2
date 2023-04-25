@@ -3,24 +3,44 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>cn.edu.sustech.cs209.chatting</groupId>
-        <artifactId>chatting</artifactId>
-        <version>dev-SNAPSHOT</version>
-    </parent>
+    <groupId>cn.edu.sustech.cs209.chatting</groupId>
+    <artifactId>chatting</artifactId>
+    <version>dev-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>chatting-client</module>
+        <module>chatting-server</module>
+        <module>chatting-common</module>
+    </modules>
 
     <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
     </properties>
 
-    <artifactId>chatting-server</artifactId>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>cn.edu.sustech.cs209.chatting</groupId>
+                <artifactId>chatting-common</artifactId>
+                <version>dev-SNAPSHOT</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
-    <dependencies>
-        <dependency>
-            <groupId>cn.edu.sustech.cs209.chatting</groupId>
-            <artifactId>chatting-common</artifactId>
-        </dependency>
-    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.10.1</version>
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
