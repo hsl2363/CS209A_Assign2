@@ -135,6 +135,7 @@ public class Main {
 
         public ClientHandler(String username, Socket socket) throws IOException {
             this.clientSocket = socket;
+            this.username = username;
             out = new PrintWriter(clientSocket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         }

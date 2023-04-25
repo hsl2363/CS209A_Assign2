@@ -88,13 +88,14 @@ public class Controller implements Initializable {
 								userList.setItems(ulist);
 								currentOnlinecnt.setText("Online users: " + ulist.size());
 							});
+							users = ulist;
 							System.out.println("UserCnt: " + ulist.size());
 							break;
 						case "ServerClose":
 							Platform.runLater(() -> {
 								Alert closed = new Alert(AlertType.WARNING);
 								closed.setContentText("Server has closed, exiting");
-								closed.show();
+								closed.showAndWait();
 								Platform.exit();
 							});
 							break;
@@ -144,7 +145,7 @@ public class Controller implements Initializable {
 							Platform.runLater(() -> {
 								Alert nameused = new Alert(AlertType.WARNING);
 								nameused.setContentText("User name has been used! Please change the user name");
-								nameused.show();
+								nameused.showAndWait();
 								Platform.exit();
 							});
 							break;
@@ -195,7 +196,7 @@ public class Controller implements Initializable {
 				Platform.runLater(() -> {
 					Alert invalid = new Alert(AlertType.ERROR);
 					invalid.setContentText("Invalid username, exiting");
-					invalid.show();
+					invalid.showAndWait();
 					Platform.exit();
 				});
 			}
@@ -204,7 +205,7 @@ public class Controller implements Initializable {
 			Platform.runLater(() -> {
 				Alert failed = new Alert(AlertType.ERROR);
 				failed.setContentText("Connect failed.");
-				failed.show();
+				failed.showAndWait();
 				Platform.exit();
 			});
 		}
@@ -218,7 +219,7 @@ public class Controller implements Initializable {
 		ComboBox<String> userSel = new ComboBox<>();
 
 		for (String name : users) {
-			if (name.equals(username))
+			if (!name.equals(username))
 				userSel.getItems().add(name);
 		}
 		// Done: get the user list from server, the current user's name should be
@@ -277,7 +278,7 @@ public class Controller implements Initializable {
 		Stage stage = new Stage();
 		List<CheckBox> names = new ArrayList<>();
 		for (String name : users) {
-			if (name.equals(username) == false)
+			if (!name.equals(username))
 				names.add(new CheckBox(name));
 		}
 		Button okBtn = new Button("OK");
