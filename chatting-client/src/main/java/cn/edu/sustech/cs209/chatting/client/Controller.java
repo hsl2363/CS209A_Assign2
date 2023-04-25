@@ -153,7 +153,7 @@ public class Controller implements Initializable {
 		try {
 			socket = new Socket("localhost", 2363);
 			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			out = new PrintWriter(socket.getOutputStream());
+			out = new PrintWriter(socket.getOutputStream(), true);
 			ServerHandler T = new ServerHandler();
 			Thread t = new Thread(T);
 			t.start();

@@ -101,7 +101,7 @@ public class Main {
             Socket socket = serversocket.accept();
             usersockets.add(socket);
 
-            PrintWriter out = new PrintWriter(socket.getOutputStream());
+            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             if ((username = in.readLine()) != null) {
                 if (somap.containsKey(username)) {
