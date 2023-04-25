@@ -22,12 +22,11 @@ public class Main {
     private static Map<Integer, List<String>> Groupmember = new HashMap<>();
 
     private static void UpdateUserList() {
-        String S = "UserList;";
-        for (ClientHandler h : handlers) {
-            for (String n : usernames)
-                S += n;
+        String S = "UserList";
+        for (String n : usernames)
+            S += ";" + n;
+        for (ClientHandler h : handlers)
             h.out.println(S);
-        }
     }
 
     private static void CloseBroadcast() {
@@ -117,12 +116,12 @@ public class Main {
                 username = null;
             somap.put(username, socket);
             System.out.printf("%s Connected.", username);
-            
+
             ClientHandler T = new ClientHandler(username, socket);
             handlers.add(T);
             Thread t = new Thread(T);
             t.start();
-            
+
             UpdateUserList();
             chmap.put(username, T);
         }

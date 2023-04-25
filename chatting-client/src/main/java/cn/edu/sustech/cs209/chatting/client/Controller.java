@@ -307,7 +307,6 @@ public class Controller implements Initializable {
 					"SendMessageP;" + username + ";" + SendTo + ";" + System.currentTimeMillis() + ";" + content);
 		}
 		inputArea.clear();
-		// DONE
 	}
 
 	/**
@@ -370,7 +369,7 @@ public class Controller implements Initializable {
 						return;
 					}
 
-					Label name;
+					Label chatname;
 
 					if (chat.getGroup() > 0) {
 						String S = "";
@@ -379,18 +378,19 @@ public class Controller implements Initializable {
 								S += ", ";
 							S += s;
 						}
-						name = new Label(S);
+						chatname = new Label(S);
 					} else
-						name = new Label(chat.getMember().get(0).equals(username) ? chat.getMember().get(1) : username);
+						chatname = new Label(
+								chat.getMember().get(0).equals(username) ? chat.getMember().get(1) : username);
 
-					name.setPrefSize(50, 20);
-					name.setWrapText(false);
+					chatname.setPrefSize(50, 20);
+					chatname.setWrapText(false);
 					if (chat.getUpdate())
-						name.setStyle("-fx-text-fill: red;");
+						chatname.setStyle("-fx-text-fill: red;");
 					else
-						name.setStyle("-fx-text-fill: black;");
+						chatname.setStyle("-fx-text-fill: black;");
 					setContentDisplay(ContentDisplay.LEFT);
-					setGraphic(name);
+					setGraphic(chatname);
 				}
 			};
 			cell.setOnMouseClicked(event -> {
