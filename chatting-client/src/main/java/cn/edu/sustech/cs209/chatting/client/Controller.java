@@ -248,8 +248,9 @@ public class Controller implements Initializable {
 		else {
 			Chat chat = new Chat(Arrays.asList(username, user.get()), 0);
 			privatechats.put(user.get(), chat);
-			out.println("CreatePrivate;" + username + user.get());
+			out.println("CreatePrivate;" + username + ";" + user.get());
 			Platform.runLater(() -> {
+				ChatList.getItems().add(chat);
 				chatContentList.setItems(chat.getmsg());
 			});
 		}
