@@ -11,7 +11,7 @@ public class Main extends Application {
 
     private Controller controller;
 
-    public static void main(String[] args) {
+    public void main(String[] args) {
         launch();
     }
 
@@ -27,7 +27,7 @@ public class Main extends Application {
     @Override
     public void stop() {
         controller.Quit();
-        System.out.printf("Quit.");
+        System.out.printf("quit.");
     }
 
 }

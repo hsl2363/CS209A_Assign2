@@ -30,10 +30,9 @@ public class Main {
     }
 
     private static void CloseBroadcast() {
-        String S = "ServerClosed";
-        for (ClientHandler h : handlers) {
+        String S = "ServerClose";
+        for (ClientHandler h : handlers)
             h.out.println(S);
-        }
     }
 
     private static void DeleteUser(String username, Socket socket, ClientHandler ch) {

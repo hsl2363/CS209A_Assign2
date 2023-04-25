@@ -90,11 +90,13 @@ public class Controller implements Initializable {
 							});
 							System.out.println("UserCnt: " + ulist.size());
 							break;
-						case "ServerClosed":
-							Alert closed = new Alert(AlertType.WARNING);
-							closed.setContentText("Server has closed, exiting");
-							closed.show();
-							Platform.exit();
+						case "ServerClose":
+							Platform.runLater(() -> {
+								Alert closed = new Alert(AlertType.WARNING);
+								closed.setContentText("Server has closed, exiting");
+								closed.show();
+								Platform.exit();
+							});
 							break;
 
 						case "SendMessageP":
@@ -139,10 +141,12 @@ public class Controller implements Initializable {
 							});
 							break;
 						case "CheckNO":
-							Alert nameused = new Alert(AlertType.WARNING);
-							nameused.setContentText("User name has been used! Please change the user name");
-							nameused.show();
-							Platform.exit();
+							Platform.runLater(() -> {
+								Alert nameused = new Alert(AlertType.WARNING);
+								nameused.setContentText("User name has been used! Please change the user name");
+								nameused.show();
+								Platform.exit();
+							});
 							break;
 						default:
 							System.out.println("unrecognized: " + str[0] + str[1]);
@@ -188,17 +192,21 @@ public class Controller implements Initializable {
 				out.println(input.get());
 				System.out.println(input.get());
 			} else {
-				Alert invalid = new Alert(AlertType.ERROR);
-				invalid.setContentText("Invalid username, exiting");
-				invalid.show();
-				Platform.exit();
+				Platform.runLater(() -> {
+					Alert invalid = new Alert(AlertType.ERROR);
+					invalid.setContentText("Invalid username, exiting");
+					invalid.show();
+					Platform.exit();
+				});
 			}
 		} catch (IOException e) {
 			System.out.println(e);
-			Alert failed = new Alert(AlertType.ERROR);
-			failed.setContentText("Connect failed.");
-			failed.show();
-			Platform.exit();
+			Platform.runLater(() -> {
+				Alert failed = new Alert(AlertType.ERROR);
+				failed.setContentText("Connect failed.");
+				failed.show();
+				Platform.exit();
+			});
 		}
 	}
 
