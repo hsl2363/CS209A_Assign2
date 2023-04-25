@@ -28,15 +28,15 @@
          <children>
             <TitledPane maxHeight="1.7976931348623157E308" text="Chatting">
                <content>
-                  <ListView prefWidth="220.0" />
+                  <ListView fx:id="ChatList" prefWidth="220.0" />
                </content>
             </TitledPane>
             <TitledPane maxHeight="1.7976931348623157E308" VBox.vgrow="SOMETIMES">
                <content>
-                    <ListView fx:id="chatList" prefWidth="220.0" />
+                    <ListView fx:id="userList" prefWidth="220.0" />
                </content>
                <graphic>
-                    <Label fx:id="Onlinecnt" text="Online Users: ">
+                    <Label fx:id="currentOnlinecnt" text="Online Users: ">
                      <font>
                         <Font size="11.0" fx:id="x6" />
                      </font>

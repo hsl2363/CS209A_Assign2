@@ -103,24 +103,27 @@ public class Main {
 
             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            if ((username = in.readLine()) != null) {
+            char[] input = new char[1000];
+            int len = 0;
+            if ((len = in.read(input)) != -1) {
+                username = new String(input).substring(0, len - 2);
                 if (somap.containsKey(username)) {
-                    out.println("NO");
+                    out.println("CheckNO");
                 } else {
-                    out.println("OK");
+                    out.println("CheckOK;" + username);
                     usernames.add(username);
-                    break;
                 }
-            }
-            in.close();
+            } else
+                username = null;
             somap.put(username, socket);
             System.out.printf("%s Connected.", username);
-            UpdateUserList();
-
+            
             ClientHandler T = new ClientHandler(username, socket);
             handlers.add(T);
             Thread t = new Thread(T);
             t.start();
+            
+            UpdateUserList();
             chmap.put(username, T);
         }
 
@@ -142,10 +145,11 @@ public class Main {
         public void run() {
             try {
                 boolean quit = false;
-                String input;
+                char[] input = new char[10000];
                 String[] str;
-                while ((input = in.readLine()) != null) {
-                    str = input.split(";");
+                int len = 0;
+                while ((len = in.read(input)) != -1) {
+                    str = new String(input).substring(0, len - 2).split(";");
                     switch (str[0]) {
                         case "UserQuit":
                             quit = true;
@@ -160,13 +164,13 @@ public class Main {
                             CreateGroup(users);
                             break;
                         case "SendMessageP":
-                            SendMessage(str[2], input);
+                            SendMessage(str[2], input.toString());
                             break;
                         case "SendMessageG":
-                            SendMessage(Integer.valueOf(str[2]), input);
+                            SendMessage(Integer.valueOf(str[2]), input.toString());
                             break;
                         default:
-                            System.out.println("unrecognized");
+                            System.out.println("unrecognized: " + str[0]);
                             break;
                     }
                     if (quit) {

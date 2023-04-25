@@ -40,7 +40,6 @@ public class Controller implements Initializable {
 
 	private Socket socket;
 	private PrintWriter out;
-	private BufferedReader in;
 
 	private String username;
 
@@ -80,10 +79,12 @@ public class Controller implements Initializable {
 		public void run() {
 			try {
 				in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-				String input;
+				char[] input = new char[100000];
 				String[] str;
-				while ((input = in.readLine()) != null) {
-					str = input.split(";");
+				int len = 0;
+				while ((len = in.read(input)) != -1) {
+					str = new String(input).substring(0, len - 2).split(";");
+					System.out.println(str[0]);
 					switch (str[0]) {
 						case "UserList":
 							ObservableList<String> ulist = FXCollections.observableArrayList();
@@ -92,6 +93,8 @@ public class Controller implements Initializable {
 								ulist.add(s);
 							}
 							userList.setItems(ulist);
+							currentOnlinecnt.setText("Online users: " + ulist.size());
+							System.out.println("UserCnt: " + ulist.size());
 							break;
 						case "ServerClosed":
 							Alert closed = new Alert(AlertType.WARNING);
@@ -131,8 +134,18 @@ public class Controller implements Initializable {
 							groupchats.put(gid, c);
 							ChatList.getItems().add(c);
 							break;
+						case "CheckOK":
+							username = str[1];
+							currentuser.setText("Current User: " + username);
+							break;
+						case "CheckNO":
+							Alert nameused = new Alert(AlertType.WARNING);
+							nameused.setContentText("User name has been used! Please change the user name");
+							nameused.show();
+							Platform.exit();
+							break;
 						default:
-							System.out.println("unrecognized");
+							System.out.println("unrecognized: " + str[0] + str[1]);
 							break;
 					}
 				}
@@ -140,6 +153,7 @@ public class Controller implements Initializable {
 				System.out.println("Error handling server: " + e);
 			} finally {
 				try {
+					System.out.println("socket close");
 					socket.close();
 				} catch (IOException e) {
 					System.out.println("Error closing server socket: " + e);
@@ -152,13 +166,11 @@ public class Controller implements Initializable {
 	public void initialize(URL url, ResourceBundle resourceBundle) {
 		try {
 			socket = new Socket("localhost", 2363);
-			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			out = new PrintWriter(socket.getOutputStream(), true);
 			ServerHandler T = new ServerHandler();
 			Thread t = new Thread(T);
 			t.start();
 			userList.setCellFactory(new UserCellFactory());
-			currentOnlinecnt = new Label("Online user:");
 			chatContentList.setCellFactory(new MessageCellFactory());
 			ChatList.setCellFactory(new ChatCellFactory());
 			ChatList.setItems(FXCollections.observableArrayList());
@@ -170,15 +182,8 @@ public class Controller implements Initializable {
 
 			Optional<String> input = dialog.showAndWait();
 			if (input.isPresent() && !input.get().isEmpty()) {
-				out.println(username);
-				if (in.readLine().equals("OK"))
-					username = input.get();
-				else {
-					Alert nameused = new Alert(AlertType.WARNING);
-					nameused.setContentText("User name has been used! Please change the user name");
-					nameused.show();
-					Platform.exit();
-				}
+				out.println(input.get());
+				System.out.println(input.get());
 			} else {
 				Alert invalid = new Alert(AlertType.ERROR);
 				invalid.setContentText("Invalid username, exiting");
@@ -187,8 +192,11 @@ public class Controller implements Initializable {
 			}
 		} catch (IOException e) {
 			System.out.println(e);
+			Alert failed = new Alert(AlertType.ERROR);
+			failed.setContentText("Connect failed.");
+			failed.show();
+			Platform.exit();
 		}
-		currentuser.setText("Current User: " + username);
 	}
 
 	@FXML
@@ -286,13 +294,17 @@ public class Controller implements Initializable {
 	@FXML
 	public void doSendMessage() {
 		String content = inputArea.getText();
+		if (content.length() == 0)
+			return;
 		if (currentchat.getGroup() > 0) {
 			int SendTo = currentchat.getGroup();
-			out.println("SendMessageG;" + username + ";" + SendTo + ";" + System.currentTimeMillis() + ";" + content);
+			out.println(
+					"SendMessageG;" + username + ";" + SendTo + ";" + System.currentTimeMillis() + ";" + content);
 		} else {
 			String SendTo = currentchat.getMember().get(0).equals(username) ? currentchat.getMember().get(1)
 					: currentchat.getMember().get(0);
-			out.println("SendMessageP;" + username + ";" + SendTo + ";" + System.currentTimeMillis() + ";" + content);
+			out.println(
+					"SendMessageP;" + username + ";" + SendTo + ";" + System.currentTimeMillis() + ";" + content);
 		}
 		inputArea.clear();
 		// DONE
